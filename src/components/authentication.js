@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux'; // Import useSelector and useDispatch
+import { useDispatch, useSelector } from 'react-redux';
 import Login from './login';
 import Register from './register';
 import { logoutUser } from '../actions/authActions';
-import { Nav, Button } from 'react-bootstrap';
+import actionTypes from '../constants/actionTypes';
+import { Nav, Button, Alert } from 'react-bootstrap';
 
 const Authentication = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -12,10 +13,12 @@ const Authentication = () => {
   // Retrieve Redux state values
   const loggedIn = useSelector((state) => state.auth.loggedIn);
   const username = useSelector((state) => state.auth.username);
+  const error = useSelector((state) => state.auth.error);
 
   // Switch tabs when user selects a tab
   const handleSelect = (selectedKey) => {
     setActiveTab(selectedKey);
+    dispatch({ type: actionTypes.AUTH_ERROR, message: '' });
   };
 
   const logout = () => {
@@ -33,6 +36,7 @@ const Authentication = () => {
           <Nav.Link eventKey="register">Register</Nav.Link>
         </Nav.Item>
       </Nav>
+      {error ? <Alert variant="danger" className="mb-3">{error}</Alert> : null}
       {/* Conditionally render based on the active tab */}
       {activeTab === 'register' ? <Register /> : <Login />}
     </div>

@@ -17,6 +17,7 @@ function logout() {
 
 export function submitLogin(data) {
     return dispatch => {
+        dispatch({ type: actionTypes.AUTH_ERROR, message: '' });
         return fetch(`${env.REACT_APP_API_URL}/signin`, {
             method: 'POST',
             headers: {
@@ -26,21 +27,25 @@ export function submitLogin(data) {
             body: JSON.stringify(data),
             mode: 'cors'
         }).then((response) => {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response.json()
-        }).then((res) => {
-            localStorage.setItem('username', data.username);
-            localStorage.setItem('token', res.token);
-
-            dispatch(userLoggedIn(data.username));
-        }).catch((e) => console.log(e));
+            return response.json().catch(() => ({})).then((res) => {
+                if (!response.ok) {
+                    dispatch({ type: actionTypes.AUTH_ERROR, message: res.msg || res.message || 'Sign in failed.' });
+                    return;
+                }
+                localStorage.setItem('username', data.username);
+                localStorage.setItem('token', res.token);
+                dispatch(userLoggedIn(data.username));
+            });
+        }).catch((e) => {
+            console.log(e);
+            dispatch({ type: actionTypes.AUTH_ERROR, message: 'Network error. Check API URL.' });
+        });
     }
 }
 
 export function submitRegister(data) {
     return dispatch => {
+        dispatch({ type: actionTypes.AUTH_ERROR, message: '' });
         return fetch(`${env.REACT_APP_API_URL}/signup`, {
             method: 'POST',
             headers: {
@@ -50,13 +55,17 @@ export function submitRegister(data) {
             body: JSON.stringify(data),
             mode: 'cors'
         }).then((response) => {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response.json()
-        }).then((res) => {
-            dispatch(submitLogin(data));
-        }).catch((e) => console.log(e));
+            return response.json().catch(() => ({})).then((res) => {
+                if (!response.ok) {
+                    dispatch({ type: actionTypes.AUTH_ERROR, message: res.message || res.msg || 'Sign up failed.' });
+                    return;
+                }
+                dispatch(submitLogin(data));
+            });
+        }).catch((e) => {
+            console.log(e);
+            dispatch({ type: actionTypes.AUTH_ERROR, message: 'Network error. Check API URL.' });
+        });
     }
 }
 

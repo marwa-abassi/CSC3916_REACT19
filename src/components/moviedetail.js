@@ -34,31 +34,37 @@ const MovieDetail = () => {
       <Card className="bg-dark text-dark p-4 rounded">
         <Card.Header>Movie Detail</Card.Header>
         <Card.Body>
-          <Image className="image" src={selectedMovie.imageUrl} thumbnail />
+          {selectedMovie.imageUrl && <Image className="image" src={selectedMovie.imageUrl} thumbnail />}
         </Card.Body>
         <ListGroup>
           <ListGroupItem>{selectedMovie.title}</ListGroupItem>
+          <ListGroupItem>{selectedMovie.releaseDate && <span>Year: {selectedMovie.releaseDate}</span>}</ListGroupItem>
+          <ListGroupItem>{selectedMovie.genre && <span>Genre: {selectedMovie.genre}</span>}</ListGroupItem>
           <ListGroupItem>
-            {selectedMovie.actors.map((actor, i) => (
+            {selectedMovie.actors && selectedMovie.actors.length > 0 ? selectedMovie.actors.map((actor, i) => (
               <p key={i}>
                 <b>{actor.actorName}</b> {actor.characterName}
               </p>
-            ))}
+            )) : null}
           </ListGroupItem>
-          <ListGroupItem>
-            <h4>
-              <BsStarFill /> {selectedMovie.avgRating}
-            </h4>
-          </ListGroupItem>
+          {selectedMovie.avgRating != null && (
+            <ListGroupItem>
+              <h4>
+                <BsStarFill /> {selectedMovie.avgRating}
+              </h4>
+            </ListGroupItem>
+          )}
         </ListGroup>
-        <Card.Body className="card-body bg-white">
-          {selectedMovie.reviews.map((review, i) => (
-            <p key={i}>
-              <b>{review.username}</b>&nbsp; {review.review} &nbsp; <BsStarFill />{' '}
-              {review.rating}
-            </p>
-          ))}
-        </Card.Body>
+        {selectedMovie.reviews && selectedMovie.reviews.length > 0 && (
+          <Card.Body className="card-body bg-white">
+            {selectedMovie.reviews.map((review, i) => (
+              <p key={i}>
+                <b>{review.username}</b>&nbsp; {review.review} &nbsp; <BsStarFill />{' '}
+                {review.rating}
+              </p>
+            ))}
+          </Card.Body>
+        )}
       </Card>
     );
   };
